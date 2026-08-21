@@ -1,6 +1,4 @@
-# GitHub Pages — public EMT / helper tapper (no PHI).
-# Public repo, so Actions minutes stay free. Source of files is private frisky
-# via scripts/publish-github-io.sh.
+# Assemble chunked tapper shell, then publish GitHub Pages.
 name: GitHub Pages
 
 on:
@@ -25,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Assemble tapper shell
+        run: python3 scripts/assemble.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
