@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff7f7">
+<meta name="referrer" content="no-referrer">
+<title>RedMed</title>
+<style>html,body{background:#fff7f7!important;margin:0}</style>
+<script>
+(function () {
+  var q = location.search || "";
+  var h = location.hash || "";
+  location.replace("tapper/" + q + h);
+})();
+</script>
+<meta http-equiv="refresh" content="0;url=tapper/">
+</head>
+<body>
+  <p><a id="go" href="tapper/">Open RedMed card</a></p>
+  <script>
+    document.getElementById("go").href = "tapper/" + (location.search || "") + (location.hash || "");
+  </script>
+</body>
+</html>
