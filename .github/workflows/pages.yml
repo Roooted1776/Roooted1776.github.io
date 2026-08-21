@@ -1,33 +1,53 @@
-# Assemble chunked tapper shell, then publish GitHub Pages.
+# Assemble chunked tapper shell and commit onto main so legacy
+# GitHub Pages (branch deploy) can serve /tapper/.
 name: GitHub Pages
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'chunks/**'
+      - 'scripts/assemble.py'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: pages-assemble
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  assemble:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Assemble tapper shell
-        run: python3 scripts/assemble.py
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-      - id: deployment
-        uses: actions/deploy-pages@v4
+        run: |
+          set -euo pipefail
+          python3 scripts/assemble.py
+          test -f tapper/index.html
+          grep -q 'data-tab="medical"' tapper/index.html
+          grep -q 'data-tab="911"' tapper/index.html
+          grep -q 'data-tab="aid"' tapper/index.html
+          test -f tapper/pheart.png
+          test -f BrandWordmark.png
+
+      - name: Commit assembled shell for legacy Pages
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            tapper/index.html tapper.html \
+            tapper/pheart.png tapper/BrandLogo.png tapper/BrandWordmark.png \
+            pheart.png BrandLogo.png BrandWordmark.png \
+            assets/pheart.png assets/BrandLogo.png assets/BrandWordmark.png
+          if git diff --cached --quiet; then
+            echo "assembled shell already up to date"
+            exit 0
+          fi
+          git commit -m "Assemble passerby shell from chunks [skip ci]"
+          git push
