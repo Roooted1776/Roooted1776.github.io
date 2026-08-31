@@ -1,0 +1,75 @@
+# Publish the RedMed passerby shell from Roooted1776/frisky.
+# Live write base: https://roooted1776.github.io/tapper/
+# HTML / SW / assets only. No PHI. Source of truth is frisky.
+
+name: Publish tapper
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout frisky (source of truth)
+        uses: actions/checkout@v4
+        with:
+          repository: Roooted1776/frisky
+          path: frisky
+
+      - name: Stage passerby shell
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/site"
+          bash frisky/scripts/publish-github-io.sh "$RUNNER_TEMP/site"
+          f="$RUNNER_TEMP/site/tapper/index.html"
+          test -f "$f"
+          grep -q 'data-tab="medical"' "$f"
+          grep -q 'data-tab="911"' "$f"
+          grep -q 'data-tab="aid"' "$f"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/site
+          includeHiddenFiles: true
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Smoke /tapper/
+        run: |
+          set -euo pipefail
+          ok=0
+          for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+            code=$(curl -sS -o /tmp/tapper.out -w '%{http_code}' https://roooted1776.github.io/tapper/ || true)
+            if [ "$code" = "200" ] && grep -q 'data-tab="medical"' /tmp/tapper.out && grep -q 'data-tab="911"' /tmp/tapper.out && grep -q 'data-tab="aid"' /tmp/tapper.out; then
+              ok=1
+              break
+            fi
+            sleep 6
+          done
+          if [ "$ok" != 1 ]; then
+            echo "::error::https://roooted1776.github.io/tapper/ did not serve RedMed · 911 · Aid"
+            exit 1
+          fi
