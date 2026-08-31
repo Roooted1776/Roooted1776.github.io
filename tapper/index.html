@@ -189,7 +189,7 @@ function redmedAssetURL(file) {
     /* Fluid shell — SE → Pro Max → iPad / landscape. */
     --page-max: 480px;
     --page-pad-x: clamp(16px, 4.2vw, 28px);
-    --tabbar-h: 56px; /* matches ContentView content inset */
+    --tabbar-h: 56.5px; /* matches ContentView content inset */
     --fs-name: 22px; /* hero under logo — RED-9 / Main.dc */
     --fs-row: 14px; /* YOU rows + lists — matches Theme CardRow */
     --fs-title: 16px;
@@ -201,10 +201,10 @@ function redmedAssetURL(file) {
     --safe-l: env(safe-area-inset-left, 0px);
   }
   @media (min-width: 600px) {
-    :root { --page-max: 560px; --tabbar-h: 56px; }
+    :root { --page-max: 560px; --tabbar-h: 56.5px; }
   }
   @media (min-width: 768px) {
-    :root { --page-max: 680px; --tabbar-h: 56px; --box: 10px; }
+    :root { --page-max: 680px; --tabbar-h: 56.5px; --box: 10px; }
   }
   @media (min-width: 1024px) {
     :root { --page-max: 760px; }
@@ -1280,7 +1280,13 @@ function redmedAssetURL(file) {
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  /* Live hospital list — TopicDetailView's LiveNearbyHospitalsSection, web equivalent */
+  .aid-hosp-note {
+    margin: 0 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--muted);
+  }
   .aid-hosp-status {
     display: flex;
     align-items: center;
@@ -1376,7 +1382,7 @@ function redmedAssetURL(file) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4.5px var(--safe-r) var(--safe-b) var(--safe-l);
+    padding: 5px var(--safe-r) var(--safe-b) var(--safe-l);
     z-index: 30;
   }
   .tabs {
@@ -1457,7 +1463,7 @@ function redmedAssetURL(file) {
   @media (max-width: 360px) {
     :root {
       --page-pad-x: 10px;
-      --tabbar-h: 58px;
+      --tabbar-h: 58.5px;
     }
     .seizure-strip { flex-wrap: wrap; }
   }
@@ -1780,7 +1786,7 @@ function redmedAssetURL(file) {
   var BLOOD = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
   var ZLIB_VERSION = 0x01;
   var AES_VERSION = 0x02;
-  var KEY_LABEL = 'RedMed-NFC-AES-GCM-v1';
+  var KEY_LABEL = 'RedMed-NFC-AES-GCM-v1'; // lockstep: scripts/test-d-codec.mjs
   var aesKeyPromise = null;
 
   function asString(v, fallback) {
@@ -2660,8 +2666,12 @@ function redmedAssetURL(file) {
             'way["amenity"="hospital"](around:' + HOSP_RADIUS_M + ',' + lat + ',' + lon + ');' +
             'relation["amenity"="hospital"](around:' + HOSP_RADIUS_M + ',' + lat + ',' + lon + ');' +
             ');out center 20;';
-          var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(q);
-          fetch(url).then(function (res) {
+          var url = 'https://overpass-api.de/api/interpreter';
+          fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: 'data=' + encodeURIComponent(q)
+          }).then(function (res) {
             if (!res.ok) throw new Error('bad status');
             return res.json();
           }).then(function (data) {
@@ -2717,7 +2727,9 @@ function redmedAssetURL(file) {
         });
         html += '</div>';
         if (key === 'trauma-hospitals') {
-          html += '<div class="aid-sec-label">Nearest Hospitals — Live</div><div id="aidHospBody"></div>';
+          html += '<div class="aid-sec-label">Nearest Hospitals — Live</div>';
+          html += '<p class="aid-hosp-note">Search uses OpenStreetMap Overpass (overpass-api.de). That service sees this phone’s coordinates. Not a RedMed server.</p>';
+          html += '<div id="aidHospBody"></div>';
         }
         scroll.innerHTML = html;
         scroll.scrollTop = 0;
@@ -3050,6 +3062,8 @@ function redmedAssetURL(file) {
   var fireTimer = null;
   var keepAliveTimer = null;
   var audioNeedsGesture = false;
+  var stoppingAudio = false;
+  var reclaimLock = false;
 
   function paint() {
     // Matches owner FindHelpSOSButton / this page's own Aid "Stop The Alarm" copy.
@@ -3132,6 +3146,7 @@ function redmedAssetURL(file) {
         htmlAudio.playsInline = true;
         htmlAudio.preload = 'auto';
         htmlAudio.volume = 1;
+        wireHtmlAudio(htmlAudio);
       }
       htmlAudio.currentTime = 0;
       var p = htmlAudio.play();
@@ -3151,6 +3166,36 @@ function redmedAssetURL(file) {
     }
   }
 
+  function wireHtmlAudio(el) {
+    function onLost() {
+      if (!armed || stoppingAudio) return;
+      // Natural three-beep end fires pause+ended — do not restart (5s timer owns that).
+      if (el.ended) return;
+      reclaimAudio();
+    }
+    el.addEventListener('pause', onLost);
+    el.addEventListener('stalled', onLost);
+    el.addEventListener('error', onLost);
+    try {
+      el.addEventListener('webkitcurrentplaybacktargetiswirelesschanged', onLost);
+    } catch (e) {}
+  }
+
+  // Bluetooth disconnect / headphone unplug / audio switch pauses HTMLAudio
+  // and interrupts AudioContext. SOS Locate Me takes the new output.
+  function reclaimAudio() {
+    if (!armed || stoppingAudio || reclaimLock) return;
+    reclaimLock = true;
+    if (ctx && ctx.state !== 'running') {
+      ctx.resume().catch(function () {});
+    }
+    var dead = !htmlAudio || htmlAudio.error;
+    var cutOff = htmlAudio && htmlAudio.paused && !htmlAudio.ended;
+    if (dead || cutOff) fireSirenBurst();
+    else ensurePlaying();
+    setTimeout(function () { reclaimLock = false; }, 250);
+  }
+
   function ensurePlaying() {
     if (!armed) return;
     if (ctx && ctx.state === 'suspended') {
@@ -3163,6 +3208,7 @@ function redmedAssetURL(file) {
   }
 
   function stopAudio() {
+    stoppingAudio = true;
     if (beepTimer) { clearInterval(beepTimer); beepTimer = null; }
     if (fireTimer) { clearInterval(fireTimer); fireTimer = null; }
     if (keepAliveTimer) { clearInterval(keepAliveTimer); keepAliveTimer = null; }
@@ -3172,7 +3218,7 @@ function redmedAssetURL(file) {
     lfo = null;
     gain = null;
     if (ctx) {
-      try { ctx.close(); } catch (e) {}
+      try { ctx.onstatechange = null; ctx.close(); } catch (e) {}
       ctx = null;
     }
     if (htmlAudio) {
@@ -3184,6 +3230,7 @@ function redmedAssetURL(file) {
       wake = null;
     }
     audioNeedsGesture = false;
+    stoppingAudio = false;
   }
 
   function startAudio() {
@@ -3212,6 +3259,9 @@ function redmedAssetURL(file) {
 
       osc.start();
       lfo.start();
+      ctx.onstatechange = function () {
+        if (armed && ctx && ctx.state !== 'running') reclaimAudio();
+      };
       if (ctx.state === 'suspended') {
         ctx.resume().catch(function () { audioNeedsGesture = true; });
       }
@@ -3455,11 +3505,21 @@ function redmedAssetURL(file) {
   }
 
   document.addEventListener('visibilitychange', function () {
-    if (!armed || !ctx) return;
-    if (document.visibilityState === 'visible' && ctx.state === 'suspended') {
-      ctx.resume();
-    }
+    if (armed) reclaimAudio();
   });
+  window.addEventListener('pageshow', function () {
+    if (armed) reclaimAudio();
+  });
+  window.addEventListener('focus', function () {
+    if (armed) reclaimAudio();
+  });
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener('devicechange', function () {
+        if (armed) reclaimAudio();
+      });
+    }
+  } catch (e) {}
 
   // Real HF NFC band tap brings #d= that decrypts — arm local SOS on this phone only.
   // No auto-arm for bare /tapper/, garbage `#d=`, or in-app Preview/Scan (?src=app).
