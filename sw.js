@@ -30,12 +30,16 @@
  * Fix #7 (Medium): putShell deduplicates SHELL_KEYS to avoid double-writing
  *   the same cache entry when reqOrUrl already appears in SHELL_KEYS.
  */
-var CACHE = 'redmed-tapper-v165';
+var CACHE = 'redmed-tapper-v172';
+// In-scope /tapper/ copies only. This worker's scope is ./ under /tapper/,
+// so ../assets/ is never intercepted — precaching it only delayed install
+// (skipWaiting waits on the whole list) and duplicated the same bytes.
 var ASSETS = [
   './pheart.png',
   './BrandLogo.png',
-  '../assets/pheart.png',
-  '../assets/BrandLogo.png'
+  './BrandLogo.svg',
+  './BrandLogo@2x.png',
+  './BrandLogo@3x.png'
 ];
 /** Primary HTML shell — install must fail closed if neither key can be cached. */
 var REQUIRED_SHELLS = ['./index.html', './'];
