@@ -35,7 +35,7 @@ jobs:
       - name: Checkout frisky (source of truth)
         uses: actions/checkout@v4
         with:
-          repository: Roooted1776/frisky
+          repository: Roooted1776/RedMed-V1-Official
           path: frisky
 
       - name: Copy passerby shell
