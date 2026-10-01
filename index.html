@@ -17,6 +17,7 @@
   <link rel="preload" as="image" href="./band-hero.webp" fetchpriority="high">
   <style>
     @media(max-width:900px){.hero-actions{flex-wrap:wrap}}
+    .hero-product{cursor:pointer}
     .hero-product>video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:65% center;pointer-events:none;transition:transform .35s ease-out}
     .hero-product>video[hidden]{display:none}
     .hero-product .product-tag,.hero-product figcaption{z-index:1}
@@ -33,7 +34,7 @@
       <svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M6 18h6l3-8 6 16 3-8h6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 33C9 27 2 22 2 13 2 3 13 0 18 7 23 0 34 3 34 13c0 9-7 14-16 20Z" stroke="currentColor" stroke-width="2"/></svg>
       <span>RedMed<span class="brand-dot">.</span></span>
     </a>
-    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/">Store</a><a href="https://redmed.live/tapper/" rel="noreferrer">Open tap page</a></nav>
+    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/" rel="noreferrer">Store</a></nav>
     <div class="header-actions"><button class="icon-button" id="theme-toggle" aria-label="Switch color theme" title="Switch color theme"><i data-lucide="sun-moon"></i></button><button class="text-button account-trigger" data-mode="signin">Sign in</button><button class="button small account-trigger" data-mode="signup">Create account</button></div>
   </header>
   <main id="main">
@@ -47,13 +48,13 @@
       </div>
       <figure class="hero-product">
         <img src="./band-hero.webp" alt="" aria-hidden="true" width="1429" height="804">
-        <video id="hero-video" muted loop playsinline preload="none" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
+        <video id="hero-video" autoplay muted loop playsinline preload="auto" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
           <source src="/assets/herovideo.MP4" type="video/mp4">
         </video>
         <div class="product-tag"><i data-lucide="nfc"></i><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
         <figcaption>REDMED BAND / PRODUCT CONCEPT</figcaption>
       </figure>
-      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" aria-pressed="false"><span id="hero-motion-label">Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
+      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" data-film="hero-video" aria-pressed="false"><span id="hero-motion-label" data-film-label>Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
     </section>
     <div class="principles"><span><i data-lucide="radio"></i> Tap or scan</span><span><i data-lucide="user-round-check"></i> No responder account</span><span><i data-lucide="shield-check"></i> Medical data stays off our servers</span><span><i data-lucide="battery"></i> Passive chip technology</span></div>
     <section class="story section" id="how">
@@ -89,13 +90,13 @@
   <dialog id="account-dialog" aria-labelledby="account-title">
     <button class="icon-button dialog-close" aria-label="Close account"><i data-lucide="x"></i></button>
     <div class="auth-view" id="auth-view"><p class="eyebrow">YOUR REDMED CONNECTION</p><h2 id="account-title">Welcome back.</h2><p id="auth-description">Sign in to manage your band records.</p><div class="auth-tabs" role="group" aria-label="Account mode"><button id="signin-tab" class="active">Sign in</button><button id="signup-tab">Create account</button></div>
-      <form id="auth-form"><label>Email address<input id="auth-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label><label>Password<input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="12" maxlength="128" placeholder="At least 12 characters"></label><label class="consent" id="signup-consent" hidden><input type="checkbox" id="privacy-consent"> <span>I understand this account stores email and band metadata, not medical information. I have read the <button type="button" id="consent-privacy">data boundaries</button>.</span></label><button class="button full" id="auth-submit">Sign in <i data-lucide="arrow-right"></i></button></form>
+      <form id="auth-form"><label id="username-field" hidden>Username (optional)<input id="auth-username" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" placeholder="letters, numbers, underscore"></label><label>Email address<input id="auth-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label><label>Password<input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="12" maxlength="128" placeholder="At least 12 characters"></label><label class="consent" id="signup-consent" hidden><input type="checkbox" id="privacy-consent"> <span>I understand this account stores email and band metadata, not medical information. I have read the <button type="button" id="consent-privacy">data boundaries</button>.</span></label><button class="button full" id="auth-submit">Sign in <i data-lucide="arrow-right"></i></button></form>
       <div class="auth-help"><button class="text-button" id="forgot-password">Forgot password?</button><button class="text-button" id="verify-open">Confirm email / invitation</button></div>
       <section id="verify-panel" hidden><h3>Finish your connection.</h3><p class="fineprint">Paste the confirmation, invitation or recovery link from your RedMed email. It is verified directly with Supabase, never saved in your band records. Do not paste a medical-card link.</p><form id="verify-form"><label>Email verification link<input id="verification-link" type="url" autocomplete="off" required maxlength="4096" placeholder="https://…supabase.co/auth/v1/verify?…"></label><button class="button secondary full">Verify email link</button></form><button class="text-button" id="resend-confirmation">Resend signup confirmation</button></section>
       <p id="auth-status" class="status" role="status" aria-live="polite"></p><p class="fineprint">This sign-in stays on this browser until you sign out. Never enter medical information here.</p>
     </div>
     <div id="dashboard" hidden>
-      <p class="eyebrow">MEMBER WORKSPACE</p><h2>Your connection hub.</h2><p id="member-email" class="member-email"></p><a class="button secondary full" href="https://redmed.live/tapper/" rel="noreferrer">Open the no-login tap page <i data-lucide="arrow-up-right"></i></a><button class="button secondary full" id="admin-open" hidden>Administration <i data-lucide="shield-check"></i></button>
+      <p class="eyebrow">MEMBER WORKSPACE</p><h2>Your connection hub.</h2><p id="member-email" class="member-email"></p><button class="button secondary full" id="admin-open" hidden>Administration <i data-lucide="shield-check"></i></button>
       <div class="dashboard-heading"><div><h3>Your bands</h3><p class="fineprint">Private inventory. Not activation or proof of ownership.</p></div><button id="refresh-bands" class="icon-button" aria-label="Refresh bands"><i data-lucide="refresh-cw"></i></button></div>
       <div id="bands-list" aria-live="polite"></div>
       <details class="register-panel"><summary>Register a band record <i data-lucide="plus"></i></summary><p class="fineprint">Use only a hardware UID. Do not paste a link, emergency card, or medical details.</p><button class="button secondary full" id="scan-nfc"><i data-lucide="nfc"></i> Read chip serial</button><p id="nfc-status" class="fineprint" role="status"></p><form id="band-form"><label>Chip serial / UID<input id="band-serial" required pattern="[0-9A-Fa-f]{8,32}" minlength="8" maxlength="32" autocomplete="off" placeholder="8–32 hexadecimal characters"></label><div class="form-row"><label>Band color<select id="band-color"><option value="red">Red</option><option value="black">Black</option><option value="white">White</option><option value="other">Other</option></select></label><label>Record status<select id="band-status"><option value="registered">Registered</option><option value="in_use">In use</option><option value="lost">Lost</option><option value="retired">Retired</option></select></label></div><button class="button full">Save band record <i data-lucide="plus"></i></button></form></details>
