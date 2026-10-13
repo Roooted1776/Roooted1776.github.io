@@ -10,7 +10,10 @@
 #
 # RM-06 additions (2026-09-30):
 #   - CSP + frame/permissions headers on /, /portal/, /portal/*, /store/, /store/*
-#   - connect-src includes Supabase project origin on portal routes
+#   - connect-src includes the Supabase project origin on home (/ , /index.html)
+#     and portal routes. Live home and www send that same connect-src
+#     (checked 2026-10-04) from the VPS portal server, which is not in this
+#     repo. /store and /tapper stay connect-src 'self'.
 #   - Existing tapper headers are preserved byte-for-byte
 #   - TODO (store owner): replace connect-src 'self' with exact Stripe/payment
 #     origins when checkout JS is wired up.
@@ -54,14 +57,17 @@
 /BrandWordmark.png
   Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
 
-# ── Home page (/)
+# ── Home page (/ and /index.html; apex and www)
+# connect-src matches the live home page. Do not add the Supabase host to
+# /store or /tapper.
 /
   Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=15552000
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co; manifest-src 'self'; upgrade-insecure-requests
 
 # ── Tapper pages (unchanged)
 /tapper
@@ -119,7 +125,7 @@
   Referrer-Policy: no-referrer
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co; manifest-src 'self'; upgrade-insecure-requests
 
 /get.html
   Cache-Control: public, max-age=0, must-revalidate

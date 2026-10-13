@@ -17,14 +17,7 @@
   function live(t) { return ok.test(t.link || ''); }
   function checkoutUrl(t) { return new URL(t.link).toString(); }
 
-  // ---- theme toggle (initial value set in theme.js) ----
-  $('theme-toggle').addEventListener('click', function () {
-    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === 'dark' ? '#1d2020' : '#f7f7f3');
-    try { localStorage.setItem('redmed-theme', next); } catch (e) {}
-  });
+  // ---- theme toggle lives in theme.js (shared with home) ----
 
   // ---- pack picker ----
   function render() {
