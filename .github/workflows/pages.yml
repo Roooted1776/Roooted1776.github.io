@@ -37,6 +37,7 @@ jobs:
         with:
           repository: Roooted1776/RedMed-V1-Official
           path: frisky
+          token: ${{ secrets.REDMED_READ_TOKEN }}
 
       - name: Copy passerby shell
         run: |
