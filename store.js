@@ -49,6 +49,30 @@
     $('sumPrice').textContent = fmt.format(t.price);
     $('sumNote').textContent = t.bands + (t.bands > 1 ? ' blank bands. ' : ' blank band. ') + t.blurb;
     $('stickyText').textContent = t.name + ' · ' + fmt.format(t.price);
+    syncPayChrome(t);
+  }
+
+  // Square marks stay hidden until config.js has a real payment link (email is the honest default).
+  function syncPayChrome(t) {
+    var on = live(t);
+    [['asidePaySquare', on], ['asideFineSquare', on], ['asidePayEmail', !on], ['asideFineEmail', !on], ['reviewPaySquare', on]]
+      .forEach(function (pair) {
+        var el = $(pair[0]);
+        if (el) el.hidden = !pair[1];
+      });
+    var checkoutBtn = $('checkoutBtn');
+    if (checkoutBtn) {
+      checkoutBtn.textContent = '';
+      checkoutBtn.appendChild(document.createTextNode(on ? 'Review and checkout ' : 'Review and order '));
+      var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      arrow.setAttribute('class', 'ic');
+      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', '#i-arrow');
+      arrow.appendChild(use);
+      checkoutBtn.appendChild(arrow);
+    }
+    var stickyBtn = $('stickyBtn');
+    if (stickyBtn) stickyBtn.textContent = on ? 'Checkout' : 'Order';
   }
 
   function move(step) {
@@ -177,12 +201,27 @@
     var userPaused = !!reduce;
     var btn = ensureButton(video);
 
+    // Phones may block autoplay (Low Power Mode, data saver). Try again on the first touch or scroll.
+    var retrying = false;
+    function retryOnGesture() {
+      if (retrying) return;
+      retrying = true;
+      var evs = ['touchstart', 'pointerdown', 'scroll', 'keydown'];
+      function go() {
+        if (userPaused) return;
+        evs.forEach(function (t) { window.removeEventListener(t, go, true); });
+        retrying = false;
+        play();
+      }
+      evs.forEach(function (t) { window.addEventListener(t, go, { capture: true, passive: true }); });
+    }
+
     function play() {
       var pending = video.play();
       if (pending && typeof pending.catch === 'function') {
         pending.catch(function () {
-          userPaused = true;
           paint(btn, true);
+          retryOnGesture();
         });
       }
       paint(btn, false);
@@ -201,7 +240,7 @@
     if (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        setPaused(!userPaused);
+        setPaused(!video.paused);
       });
     }
 
@@ -209,7 +248,7 @@
     if (clickFrame && !video.hasAttribute('controls')) {
       clickFrame.addEventListener('click', function (e) {
         if (e.target.closest('.steps, a, button, summary, input, select, textarea, label')) return;
-        setPaused(!userPaused);
+        setPaused(!video.paused);
       });
     }
 
@@ -225,6 +264,18 @@
       pointerFrame.addEventListener('mouseleave', function () {
         video.style.transform = '';
       });
+    }
+
+    video.addEventListener('playing', function () { paint(btn, false); });
+
+    // Phones often refuse autoplay until a video is on screen: start it when visible, rest it when not.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (x) {
+          if (x.isIntersecting) { if (!userPaused && video.paused) play(); }
+          else if (!video.paused) video.pause();
+        });
+      }, { threshold: 0.01, rootMargin: '300px 0px' }).observe(video);
     }
 
     if (userPaused) {

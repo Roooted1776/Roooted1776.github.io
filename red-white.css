@@ -84,6 +84,7 @@ footer .brand-mark { width: 28px; height: 28px; }
 .hero .eyebrow { color: var(--accent); }
 .hero h1 { color: var(--ink); }
 .hero h1 span { color: var(--accent); }
+.hero-definition { color: var(--ink); font-weight: 600; line-height: 1.45; max-width: 34rem; margin: 0 0 .75rem; }
 .hero-description,
 .hero-note { color: var(--muted); }
 .hero .text-button { color: var(--ink); }
@@ -238,7 +239,13 @@ h3 { text-transform: capitalize; }
   .hero .hero-product { inset: 0; -webkit-mask-image: none; mask-image: none; }
   .hero .hero-product::after { background: linear-gradient(0deg, rgba(14, 10, 11, .9) 20%, rgba(14, 10, 11, .4) 70%, rgba(14, 10, 11, .6)); }
 }
-.hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); }
+.hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); margin-bottom: .85rem; }
+.hero-definition { color: #fff; font-size: 1.125rem; font-weight: 600; line-height: 1.45; max-width: 34rem; margin: 0 0 .75rem; }
+.hero-description { max-width: 40rem; margin-top: 0; }
+/* The film stays dark in both themes, so this link cannot follow --ink. */
+.hero .text-button { color: #f6eeee; }
+.hero .text-button:hover,
+.hero .text-button:focus-visible { color: #fff; }
 
 /* see it in action: film + a step list that follows it */
 .process-section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
