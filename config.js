@@ -10,5 +10,5 @@ window.REDMED_STORE = {
     { id: 'family', name: 'Family Pack',  bands: 3, price: 70, blurb: 'Three bands for the household.',      link: '' }
   ],
   currency: 'USD',
-  supportEmail: 'help@redmed.live'
+  supportEmail: 'Admin@RedMed.live'
 };

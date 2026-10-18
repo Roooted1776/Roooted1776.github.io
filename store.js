@@ -4,7 +4,7 @@
   if (!cfg || !cfg.tiers || !cfg.tiers.length) return; // config.js missing: leave the static page alone
   var tiers = cfg.tiers;
   var selected = 'pair';
-  var qty = 1, MAX_QTY = 10; // how many of the chosen pack (used for the email order; Square's own page has its own selector)
+  var qty = 1, MAX_QTY = 10; // how many of the chosen pack (parked for Square checkout; Square's own page has its own selector)
   var wanted = /[?&]pack=([a-z0-9_-]+)/i.exec(location.search); // from the home page's Buy now buttons
   var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
   var $ = function (id) { return document.getElementById(id); };
@@ -91,16 +91,11 @@
   function setGo() {
     var t = tier(selected);
     var ready = ack.checked;
-    go.setAttribute('aria-disabled', ready ? 'false' : 'true');
-    go.href = ready ? (live(t) ? checkoutUrl(t) : orderMailto(t)) : '#buy';
-    goLabel.textContent = live(t) ? 'Continue to Square' : 'Order by email';
+    go.setAttribute('aria-disabled', ready && live(t) ? 'false' : 'true');
+    go.href = ready && live(t) ? checkoutUrl(t) : '#buy';
+    goLabel.textContent = live(t) ? 'Continue to Square' : 'Ordering opens soon';
     notice.hidden = !(ready && !live(t));
-    if (!live(t)) notice.textContent = 'Card checkout is not switched on yet. The button opens an email to ' + cfg.supportEmail + ' so you can order.';
-  }
-  function orderMailto(t) {
-    var bandsTotal = t.bands * qty;
-    var body = 'Hi RedMed,\n\nI would like to order: ' + qty + ' x ' + t.name + ' (' + bandsTotal + (bandsTotal > 1 ? ' bands' : ' band') + ' in total, ' + fmt.format(t.price * qty) + ').\n\nName:\nShipping address:\n';
-    return 'mailto:' + cfg.supportEmail + '?subject=' + encodeURIComponent('Band order: ' + qty + ' x ' + t.name) + '&body=' + encodeURIComponent(body);
+    if (!live(t)) notice.textContent = 'Ordering opens soon. Card checkout is not switched on yet.';
   }
   // Quantity step. Hidden when a live Square link exists: Square's checkout page has its own quantity selector.
   function updateReview() {

@@ -2204,13 +2204,13 @@ function redmedAssetURL(file) {
         <p class="survival-note">SOS is full sound and full light so helpers can find someone on a dark rainy night after a motorist ejects from a vehicle — only when you tap SOS · Locate Me, or when collision is detected (US Crash Detection delay). Not Apple Crash Detection. Crash detect only while this page is open. Band tap does not arm SOS.</p>
         <p class="crash-dial-hint" id="crashDialHint" hidden></p>
         <button class="aid-stop-alarm" type="button" id="aidStopAlarm" hidden>Stop The Alarm <span class="x" aria-hidden="true">✕</span></button>
-        <a class="btn btn-call" id="callEmergency911" href="tel:112"><span class="btn-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg></span>Call <span class="emg">112</span></a>
+        <a class="btn btn-call" id="callEmergency911" href="tel:911"><span class="btn-call-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg></span>Call <span class="emg">911</span></a>
         <div class="seizure-strip" id="seizureStrip">
           <div>
             <div class="seizure-label">SEIZURE</div>
             <div class="seizure-time" id="seizureTime" aria-live="polite">0:00</div>
           </div>
-          <div class="seizure-hint" id="seizureHint">Call <span class="emg">112</span> At 5:00</div>
+          <div class="seizure-hint" id="seizureHint">Call <span class="emg">911</span> At 5:00</div>
           <div class="seizure-actions">
             <button class="seizure-btn seizure-btn-reset" type="button" id="seizureResetBtn">Reset</button>
             <button class="seizure-btn" type="button" id="seizureBtn">Start</button>
@@ -2233,7 +2233,7 @@ function redmedAssetURL(file) {
         <div class="info">
           <div class="info-head">
             <div class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
-            <h2>What To Tell <span class="emg">112</span></h2>
+            <h2>What To Tell <span class="emg">911</span></h2>
           </div>
           <ul>
             <li>Your exact location — read the GPS coordinates above.</li>
@@ -3414,7 +3414,7 @@ function redmedAssetURL(file) {
       if (!sheet || !scroll || !back || !root) return;
 
       function emg() {
-        return (document.querySelector('.emg') || {}).textContent || '112';
+        return (document.querySelector('.emg') || {}).textContent || '911';
       }
       function fillEmg(s) {
         return String(s || '').split('__EMG__').join(emg());
@@ -3824,7 +3824,7 @@ function redmedAssetURL(file) {
     }
 
     function emergencyTel() {
-      var n = (document.querySelector('.emg') || {}).textContent || '112';
+      var n = (document.querySelector('.emg') || {}).textContent || '911';
       return 'tel:' + n;
     }
 
@@ -3838,7 +3838,7 @@ function redmedAssetURL(file) {
       var key = (past ? 'p' : 'w') + (running ? 'r' : 's') + ((!running && elapsed === 0) ? 'z' : 't');
       if (key === chromeKey) return;
       chromeKey = key;
-      var num = ((document.querySelector('.emg') || {}).textContent || '112');
+      var num = ((document.querySelector('.emg') || {}).textContent || '911');
       hintEl.textContent = '';
       var existingCall = document.getElementById('seizureCallBtn');
       if (past) {
@@ -3913,7 +3913,7 @@ function redmedAssetURL(file) {
 // Local emergency number for the visitor's region. The band is tapped by
 // whoever is standing over the casualty, so the card must show the number that
 // works where they are, not where the profile owner set the app up.
-// Markup ships 112 (GSM standard, routed almost everywhere) and this refines it.
+// Markup ships 911 (US default) and this refines it by region.
 (function () {
   var byRegion = {
     GB: '999', IE: '999', US: '911', CA: '911', MX: '911',
@@ -3927,7 +3927,7 @@ function redmedAssetURL(file) {
     var m = /[-_]([A-Za-z]{2})\b/.exec(navigator.language || '');
     region = m ? m[1].toUpperCase() : '';
   }
-  var num = byRegion[region] || '112';
+  var num = byRegion[region] || '911';
   var spans = document.querySelectorAll('.emg');
   for (var i = 0; i < spans.length; i++) { spans[i].textContent = num; }
   var call911 = document.getElementById('callEmergency911');
