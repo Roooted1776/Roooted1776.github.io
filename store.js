@@ -63,7 +63,7 @@
     var checkoutBtn = $('checkoutBtn');
     if (checkoutBtn) {
       checkoutBtn.textContent = '';
-      checkoutBtn.appendChild(document.createTextNode(on ? 'Review and checkout ' : 'Review and order '));
+      checkoutBtn.appendChild(document.createTextNode(on ? 'Review and checkout ' : 'Ordering opens soon '));
       var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       arrow.setAttribute('class', 'ic');
       var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -72,7 +72,7 @@
       checkoutBtn.appendChild(arrow);
     }
     var stickyBtn = $('stickyBtn');
-    if (stickyBtn) stickyBtn.textContent = on ? 'Checkout' : 'Order';
+    if (stickyBtn) stickyBtn.textContent = on ? 'Checkout' : 'Opens soon';
   }
 
   function move(step) {
