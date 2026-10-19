@@ -4,9 +4,9 @@
   if (!cfg || !cfg.tiers || !cfg.tiers.length) return; // config.js missing: leave the static page alone
   var tiers = cfg.tiers;
   var selected = 'pair';
-  var qty = 1, MAX_QTY = 10; // how many of the chosen pack (parked for Square checkout; Square's own page has its own selector)
+  var qty = 1, MAX_QTY = 10; // how many of the chosen pack (parked for Stripe checkout; Stripe's own page has its own selector)
   var wanted = /[?&]pack=([a-z0-9_-]+)/i.exec(location.search); // from the home page's Buy now buttons
-  var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
+  var ok = /^https:\/\/buy\.stripe\.com\/(test_)?[A-Za-z0-9]+\/?$/;
   var $ = function (id) { return document.getElementById(id); };
   var fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, maximumFractionDigits: 0 });
   var fmtBand = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -52,10 +52,10 @@
     syncPayChrome(t);
   }
 
-  // Square marks stay hidden until config.js has a real payment link (email is the honest default).
+  // Stripe marks stay hidden until config.js has a real Payment Link (email is the honest default).
   function syncPayChrome(t) {
     var on = live(t);
-    [['asidePaySquare', on], ['asideFineSquare', on], ['asidePayEmail', !on], ['asideFineEmail', !on], ['reviewPaySquare', on]]
+    [['asidePayStripe', on], ['asideFineStripe', on], ['asidePayEmail', !on], ['asideFineEmail', !on], ['reviewPayStripe', on]]
       .forEach(function (pair) {
         var el = $(pair[0]);
         if (el) el.hidden = !pair[1];
@@ -86,18 +86,18 @@
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { move(-1); e.preventDefault(); }
   });
 
-  // ---- review dialog, then hand off to Square ----
+  // ---- review dialog, then hand off to Stripe ----
   var dlg = $('review'), ack = $('ack'), go = $('goBtn'), notice = $('notice'), goLabel = $('goLabel');
   function setGo() {
     var t = tier(selected);
     var ready = ack.checked;
     go.setAttribute('aria-disabled', ready && live(t) ? 'false' : 'true');
     go.href = ready && live(t) ? checkoutUrl(t) : '#buy';
-    goLabel.textContent = live(t) ? 'Continue to Square' : 'Ordering opens soon';
+    goLabel.textContent = live(t) ? 'Continue to Stripe' : 'Ordering opens soon';
     notice.hidden = !(ready && !live(t));
     if (!live(t)) notice.textContent = 'Ordering opens soon. Card checkout is not switched on yet.';
   }
-  // Quantity step. Hidden when a live Square link exists: Square's checkout page has its own quantity selector.
+  // Quantity step. Hidden when a live Stripe link exists: Stripe Checkout has its own quantity selector.
   function updateReview() {
     var t = tier(selected), bandsTotal = t.bands * qty;
     $('reviewTitle').textContent = qty > 1 ? qty + ' \u00d7 ' + t.name + ' (' + bandsTotal + ' bands)' : t.name + ' (' + t.bands + (t.bands > 1 ? ' bands)' : ' band)');
@@ -107,7 +107,7 @@
     $('qtyPlus').disabled = qty >= MAX_QTY;
     $('qtyRow').hidden = live(t);
     $('payLine').textContent = live(t)
-      ? "Step 3: pay on Square's secure page with a debit or credit card, or Apple Pay and Google Pay on phones that support them. You can change the quantity there."
+      ? "Step 3: pay on Stripe's secure page with a debit or credit card, or Apple Pay and Google Pay on phones that support them. You can change the quantity there."
       : 'Step 3: card checkout is not switched on yet, so your order opens as an email to us.';
     setGo();
   }
