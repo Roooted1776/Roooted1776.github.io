@@ -1,4 +1,4 @@
-// Every open starts dark (home, store, and any page that loads this file).
+// Every open starts light (home, store, and any page that loads this file).
 // The header switch flips light/dark for the current page view.
 (function () {
   var root = document.documentElement;
@@ -26,7 +26,7 @@
     paint();
   }
 
-  apply('dark');
+  apply('light');
 
   // Safe to load twice (home loads this before and after its bundle).
   if (window.__rmTheme) return;
