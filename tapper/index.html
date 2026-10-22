@@ -6,8 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="no">
 <meta name="mobile-web-app-capable" content="no">
 <meta name="format-detection" content="telephone=yes">
-<meta name="theme-color" content="#fff7f7">
-<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f4f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100e0d" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <!-- media-src needs blob: — the SOS siren WAV is built in JS and played from a
      blob: URL; default-src 'self' alone blocks it and the alarm goes silent. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
@@ -31,7 +32,8 @@
 <link rel="icon" href="BrandLogo.png" type="image/png" sizes="216x216">
 <title>RedMed — tap to scan</title>
 <style>
-html,body{background:#fff7f7!important;margin:0}
+html,body{background:#f4f1ee!important;margin:0}
+@media (prefers-color-scheme:dark){html,body{background:#100e0d!important}}
 /* First paint = active panel only. Without this, the big stylesheet arrives late
    and every .panel is visible on cream until .panel{display:none} parses. */
 .panel{display:none} .panel.active{display:block}
@@ -43,7 +45,8 @@ html.tab-911 #panel-911,html.tab-aid #panel-aid{display:block}
    display:none !important and cannot be overridden by author CSS, which
    left lookup opens blank until late JS cleared the attribute. */
 html.is-unlinked .you-card,
-html.is-unlinked .list-grid{display:none!important}
+html.is-unlinked .list-grid,
+html.is-unlinked #dropAllergies{display:none!important}
 html.is-unlinked .rm-empty{display:block!important}
 </style>
 <script>
@@ -2128,6 +2131,162 @@ function redmedAssetURL(file) {
   .contact-block .cn { flex: 1 1 6em; }
   .contact-block a.cp { white-space: normal; overflow-wrap: anywhere; min-width: 0; max-width: 100%;
     margin-left: auto; text-align: right; }
+
+  /* ===== Modern refresh: Daylight + Night (follows the phone's light/dark setting). =====
+     Last block on purpose: it re-skins the layers above. Same content, same tabs
+     (RedMed · 911 · Aid), same controls and ids. Only colour, radius, spacing, type. */
+  :root, html[data-device] {
+    --accent: #e11d48 !important;
+    --accent-soft: #e11d48 !important;
+    --accent-hover: #be123c;
+    --bg: #f4f1ee !important;
+    --wash: #f4f1ee !important;
+    --dark: #1c1917 !important;
+    --muted: #78716c !important;
+    --tab-off: #78716c !important;
+    --divider: rgba(28,25,23,0.08) !important;
+    --surface: #ffffff !important;
+    --soft: #fff1f2;
+    --line: rgba(28,25,23,0.08);
+    --box: 16px !important;
+    --chip: 999px !important;
+    --m-card: #ffffff;
+    --m-card-hi: #f4f1ee;
+    --m-on-accent: #ffffff;
+    --m-allergy-bg: #fff1f2;
+    --m-allergy-ink: #9f1239;
+    --m-btn-dark: #1c1917;
+    --m-shadow: 0 1px 2px rgba(28,25,23,0.06), 0 8px 24px rgba(28,25,23,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root, html[data-device] {
+      --accent: #ff4d6d !important;
+      --accent-soft: #ff4d6d !important;
+      --accent-hover: #ff7289;
+      --bg: #100e0d !important;
+      --wash: #100e0d !important;
+      --dark: #faf7f5 !important;
+      --muted: #a8a29e !important;
+      --tab-off: #a8a29e !important;
+      --divider: rgba(250,247,245,0.12) !important;
+      --surface: #1c1917 !important;
+      --soft: #2b1519;
+      --line: rgba(250,247,245,0.12);
+      --m-card: #1c1917;
+      --m-card-hi: #292524;
+      --m-on-accent: #1c1917;
+      --m-allergy-bg: #2b1519;
+      --m-allergy-ink: #ffb3c1;
+      --m-btn-dark: #292524;
+      --m-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  html, body { background: var(--bg) !important; color: var(--dark); }
+  body { background: var(--bg) !important; }
+
+  /* Header: small mark, calm status. */
+  html body .rm-header { border-bottom: 0; padding-bottom: 6px; }
+  html body .rm-header .rm-logo {
+    width: 44px; height: 44px; box-shadow: 0 0 0 2px var(--m-card), 0 0 0 3px var(--line) !important;
+  }
+  html body .rm-name { color: var(--dark); }
+  html body .rm-help-chrome a { color: var(--muted); }
+  html body .rm-note { color: var(--muted) !important; letter-spacing: 0.08em; }
+  html body .rm-status, html body .rm-status.linked { color: var(--muted) !important; letter-spacing: 0.08em; }
+  html body .rm-status.linked { color: var(--accent) !important; }
+
+  /* Emergency buttons: big, rounded, thumb-sized. */
+  html body .rm-quick .btn { border-radius: 16px !important; }
+  html body .rm-quick .btn-call { background: var(--accent) !important; color: var(--m-on-accent) !important; }
+  html body .rm-quick .btn-call:hover { background: var(--accent-hover) !important; }
+  html body .rm-quick .btn-sos { background: var(--m-btn-dark) !important; color: var(--dark) !important; border: 1px solid var(--line); }
+  html body .rm-quick .btn-sos { color: #faf7f5 !important; }
+  html body .rm-quick .btn-sos.armed { background: var(--accent) !important; color: var(--m-on-accent) !important; }
+  html body .rm-quick .btn:active, html body .rm-tool-tile:active { transform: scale(0.98); }
+  html body .rm-quick-hint { color: var(--muted); }
+  html body .rm-quick .aid-stop-alarm { background: var(--m-card) !important; color: var(--dark); border-radius: 16px; }
+  html body .rm-quick .crash-dial-hint { background: var(--m-allergy-bg); color: var(--m-allergy-ink); border-radius: 12px; }
+
+  /* Quick tools. */
+  html body .rm-tool-tile, html body .rm-tools .seizure-strip {
+    background: var(--m-card) !important; border: 0 !important; border-radius: 16px !important;
+    box-shadow: var(--m-shadow) !important; color: var(--dark);
+  }
+  html body .rm-tool-tile:hover { background: var(--m-card-hi) !important; }
+  html body .rm-tool-title { color: var(--dark); }
+  html body .rm-tools .seizure-time { color: var(--dark); }
+  html body .seizure-btn { border-radius: 999px !important; }
+  html body .seizure-btn:not(.on):not(.seizure-btn-reset) { background: var(--accent) !important; color: var(--m-on-accent) !important; }
+  html body .seizure-btn.on, html body .seizure-btn-reset {
+    background: var(--m-card-hi) !important; color: var(--dark) !important; border: 0 !important;
+  }
+
+  /* Medical card: name, blood chip, allergies, then the quiet rest. */
+  html body .you-stack { gap: 12px; }
+  html body .you-stack .card.you-card, html body .you-stack .list-grid {
+    background: var(--m-card) !important; border: 0 !important; border-radius: 16px !important;
+    box-shadow: var(--m-shadow) !important; overflow: hidden;
+  }
+  html body .you-stack .row { padding: 14px 18px; border-bottom: 1px solid var(--line) !important; }
+  html body .you-stack .row:last-child { border-bottom: 0 !important; }
+  html body .you-stack .row .k {
+    font-size: 11px !important; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted) !important;
+  }
+  html body .you-stack .row .v { font-size: 17px !important; font-weight: 600 !important; color: var(--dark) !important; }
+  html body .you-stack .row .v.empty { color: var(--muted) !important; font-weight: 500 !important; }
+  html body .you-stack #rowNameRow .v { font-size: 24px !important; font-weight: 800 !important; letter-spacing: -0.02em; }
+  html body .you-stack .hero-card .row { border-bottom: 0 !important; }
+  html body .you-stack .hero-card #rowBloodRow { padding-top: 0; }
+  html body .you-stack .row.row-blood .v {
+    display: inline-block; flex: 0 0 auto; margin-left: auto; min-width: 3.2em; text-align: center; padding: 6px 18px; border-radius: 999px;
+    background: var(--m-card-hi); font-size: 28px !important; font-weight: 800 !important; line-height: 1.15;
+  }
+  html body .you-stack .row.row-blood.has-blood { background: transparent !important; }
+  html body .you-stack .row.row-blood.has-blood .v {
+    background: var(--accent); color: var(--m-on-accent) !important; font-family: var(--font-display);
+  }
+  /* Allergies: second thing a responder looks for, so it sits right under blood type. */
+  html body .you-stack #dropAllergies {
+    background: var(--m-card) !important; border: 0 !important; border-radius: 16px !important;
+    box-shadow: var(--m-shadow) !important;
+  }
+  html body .you-stack #dropAllergies:not(.is-empty) { background: var(--m-allergy-bg) !important; }
+  html body .you-stack #dropAllergies .list-drop-title { font-size: 11px !important; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted) !important; }
+  html body .you-stack #dropAllergies:not(.is-empty) .list-drop-title,
+  html body .you-stack #dropAllergies:not(.is-empty) .list-item { color: var(--m-allergy-ink) !important; }
+  html body .you-stack .list-drop-title { color: var(--muted); }
+  html body .you-stack .list-item { font-size: 17px !important; font-weight: 600; color: var(--dark); border-color: var(--line); }
+  html body .list-drop summary, html body details.list-drop { border-color: var(--line) !important; }
+  html body .band-stale { background: var(--m-card); color: var(--dark); border-color: var(--line); border-radius: 12px; }
+
+  /* Empty state + 911 / Aid surfaces: same card language. */
+  html body .rm-empty { background: var(--m-card) !important; border: 0 !important; border-radius: 16px !important; box-shadow: var(--m-shadow) !important; }
+  html body .rm-empty h2 { color: var(--dark); }
+  html body .rm-empty p { color: var(--muted); }
+  html body .rm-empty-pill { color: var(--accent) !important; }
+  html body .tool-fold, html body details.info.tool-fold, html body details.aid {
+    background: var(--m-card) !important; border: 0 !important; border-radius: 16px !important; box-shadow: var(--m-shadow) !important;
+  }
+  html body .tool-fold-title, html body details.info.tool-fold > summary h2, html body .aid-title { color: var(--dark); }
+  html body .tool-fold-sub, html body .foot-fold, html body .foot-note { color: var(--muted) !important; }
+  html body .info-icon, html body .aid-ico { background: var(--m-allergy-bg) !important; color: var(--accent) !important; border-radius: 12px !important; }
+  html body .gps-card { background: var(--m-card-hi) !important; border-radius: 16px !important; border-color: var(--line); }
+  html body .gps-actions .btn, html body .btn-ink { background: var(--m-btn-dark) !important; color: #faf7f5 !important; border-radius: 12px !important; }
+  html body .aid-topic-sheet { background: var(--m-card) !important; color: var(--dark); }
+  html body .aid-topic { border-color: var(--line) !important; }
+  html body .rm-view-chrome button { color: var(--muted); }
+
+  /* Bottom tabs. */
+  html body .tabbar {
+    background: var(--m-card) !important; border-top: 1px solid var(--line) !important;
+    border-radius: 0 !important; box-shadow: none !important;
+  }
+  html body .tab { color: var(--muted); }
+  html body .tab.active { color: var(--accent) !important; }
+  html body .tab.active .icon-wrap { background: var(--m-allergy-bg) !important; border-radius: 999px !important; }
+  html body .home-pill { background: var(--line); }
+  html body .skip-link { background: var(--m-btn-dark) !important; color: #faf7f5; }
+  html body :focus-visible { outline-color: var(--accent); }
 </style>
 <script>
 // Prefetch AES key after static CSS — overlaps body download on band taps.
@@ -2238,10 +2397,19 @@ function redmedAssetURL(file) {
       <!-- Owner YOU card — dual surface cards (identity + lists). No Accept / NFC. -->
       <div class="you-stack" id="youStack">
         <h2 class="sr-only">Medical card</h2>
-        <div class="card you-card identity-card">
+        <div class="card you-card hero-card">
           <div class="row" id="rowNameRow"><span class="k">Name</span><span class="v" id="rowName">—</span></div>
-          <div class="row" id="rowDobRow"><span class="k">Birth Date</span><span class="v empty" id="rowDob">—</span></div>
           <div class="row row-blood" id="rowBloodRow"><span class="k">Blood Type</span><span class="v empty" id="rowBlood">—</span></div>
+        </div>
+        <details class="list-drop is-empty" id="dropAllergies" open>
+          <summary>
+            <span class="list-drop-title">Allergies <span class="list-drop-count empty" id="countAllergies">—</span></span>
+            <span class="list-drop-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="list-drop-body" id="allergies"></div>
+        </details>
+        <div class="card you-card identity-card">
+          <div class="row" id="rowDobRow"><span class="k">Birth Date</span><span class="v empty" id="rowDob">—</span></div>
           <div class="row row-donor" id="rowDonorRow"><span class="k">Organ Donor</span><span class="v empty" id="rowDonor">—</span></div>
           <div class="row row-pregnant" id="rowPregnantRow"><span class="k">Pregnant</span><span class="v empty" id="rowPregnant">—</span></div>
           <div class="row row-deaf" id="rowDeafRow"><span class="k">Deaf / Vision Impaired</span><span class="v empty" id="rowDeaf">—</span></div>
@@ -2253,13 +2421,6 @@ function redmedAssetURL(file) {
           <p class="band-stale" id="bandStale" hidden>This info may be out of date. Ask the owner to update their band.</p>
         </div>
         <div class="list-grid" id="youLists">
-          <details class="list-drop is-empty" id="dropAllergies" open>
-            <summary>
-              <span class="list-drop-title">Allergies <span class="list-drop-count empty" id="countAllergies">—</span></span>
-              <span class="list-drop-chevron" aria-hidden="true"></span>
-            </summary>
-            <div class="list-drop-body" id="allergies"></div>
-          </details>
           <details class="list-drop is-empty" id="dropMedications" open>
             <summary>
               <span class="list-drop-title">Medicines <span class="list-drop-count empty" id="countMedications">—</span></span>

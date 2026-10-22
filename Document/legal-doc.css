@@ -660,3 +660,26 @@ html {
   .legal-policy { display: block !important; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; color: #78716c; }
 }
+
+/* App-only notice: hidden on the website, shown in the iPhone app.
+   scripts/sync-document.sh adds class="in-app" to the bundled copy. */
+.app-only { display: none; }
+html.in-app .app-only { display: block; }
+
+/* In-app copy only: plain scrolling. No animated glow, no blur on the sticky chip bar
+   or the section cards. The website keeps them. */
+html.in-app body::before,
+html.in-app body::after {
+  animation: none !important;
+  will-change: auto;
+}
+html.in-app .card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgba(255, 243, 244, 0.94);
+}
+html.in-app .legal-nav-sticky {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: linear-gradient(rgba(255, 247, 247, 0.97) 82%, rgba(255, 247, 247, 0));
+}
