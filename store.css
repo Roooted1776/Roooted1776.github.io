@@ -1,6 +1,6 @@
 @layer base,layout,components,responsive;
 @layer base{
-:root{--bg:#fff;--surface:#fff;--ink:#1a1214;--muted:#6d5558;--border:#f0d4d7;--accent:#c8273c;--accent-hover:#ad2032;--hero:#fff;--hero-ink:#1a1214;--hero-muted:#6d5558;--soft:#fff5f6;--veil:#ffffffe8;--veil2:#fff5f6e8;--font-body:"Satoshi",system-ui,sans-serif;--font-display:"Cabinet Grotesk","Satoshi",system-ui,sans-serif;--text-xs:.75rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.25rem;--text-2xl:clamp(2rem,4.4vw,3.5rem);--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;color-scheme:light}
+:root{--bg:#fff;--surface:#fff;--ink:#1a1214;--muted:#6d5558;--border:#f0d4d7;--accent:#c8273c;--accent-hover:#ad2032;--hero:#fff;--hero-ink:#1a1214;--hero-muted:#6d5558;--soft:#fff5f6;--veil:#ffffffe8;--veil2:#fff5f6e8;--font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;--font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;--text-xs:.75rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.25rem;--text-2xl:clamp(2rem,4.4vw,3.5rem);--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;color-scheme:light}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:6rem}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
